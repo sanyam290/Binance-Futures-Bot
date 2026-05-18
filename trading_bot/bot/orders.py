@@ -3,8 +3,8 @@ Order placement logic for Binance Futures Testnet.
 Supports MARKET and LIMIT orders for both BUY and SELL sides.
 """
 
-from binance.um_futures import UMFutures
-from binance.error import ClientError, ServerError
+from binance.client import Client
+from binance.exceptions import BinanceAPIException, BinanceOrderException
 
 from bot.logging_config import setup_logger
 
@@ -12,7 +12,7 @@ logger = setup_logger()
 
 
 def place_order(
-    client: UMFutures,
+    client: Client,
     symbol: str,
     side: str,
     order_type: str,
@@ -20,10 +20,10 @@ def place_order(
     price: float | None = None,
 ) -> dict:
     """
-    Place a futures order on the Binance Testnet.
+    Place a futures order on the Binance Futures Testnet.
 
     Args:
-        client:     Authenticated UMFutures client.
+        client:     Authenticated Binance Client (testnet=True).
         symbol:     Trading pair (e.g. 'BTCUSDT').
         side:       'BUY' or 'SELL'.
         order_type: 'MARKET' or 'LIMIT'.
@@ -34,9 +34,9 @@ def place_order(
         Order response dictionary from the Binance API.
 
     Raises:
-        ClientError: On 4xx API errors (bad request, auth, etc.).
-        ServerError: On 5xx API errors.
-        Exception:   On unexpected errors.
+        BinanceAPIException:   On API-level errors (bad symbol, margin, etc.).
+        BinanceOrderException: On order-specific errors.
+        Exception:             On unexpected errors.
     """
     params: dict = {
         "symbol": symbol,
@@ -62,7 +62,7 @@ def place_order(
     logger.debug("Order request params: %s", params)
 
     try:
-        response = client.new_order(**params)
+        response = client.futures_create_order(**params)
         logger.info(
             "Order placed successfully | Order ID: %s | Status: %s",
             response.get("orderId"),
@@ -71,17 +71,20 @@ def place_order(
         logger.debug("Full API response: %s", response)
         return response
 
-    except ClientError as exc:
+    except BinanceAPIException as exc:
         logger.error(
-            "Binance client error [%s %s]: %s",
+            "Binance API error [%s]: %s",
             exc.status_code,
-            exc.error_code,
-            exc.error_message,
+            exc.message,
         )
         raise
 
-    except ServerError as exc:
-        logger.error("Binance server error [%s]: %s", exc.status_code, exc.message)
+    except BinanceOrderException as exc:
+        logger.error(
+            "Binance order error [%s]: %s",
+            exc.status_code,
+            exc.message,
+        )
         raise
 
     except Exception as exc:

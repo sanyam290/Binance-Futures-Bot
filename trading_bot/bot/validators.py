@@ -3,6 +3,8 @@ Input validation for trading bot CLI arguments.
 All validation errors raise ValueError with a descriptive message.
 """
 
+from typing import Optional, Union
+
 VALID_SIDES = {"BUY", "SELL"}
 VALID_ORDER_TYPES = {"MARKET", "LIMIT"}
 
@@ -95,7 +97,7 @@ def validate_order_type(order_type: str) -> str:
     return order_type
 
 
-def validate_quantity(quantity: str | float) -> float:
+def validate_quantity(quantity: Union[str, float]) -> float:
     """
     Validate the order quantity.
 
@@ -123,7 +125,9 @@ def validate_quantity(quantity: str | float) -> float:
     return qty
 
 
-def validate_price(price: str | float | None, order_type: str) -> float | None:
+def validate_price(
+    price: Union[str, float, None], order_type: str
+) -> Optional[float]:
     """
     Validate the order price.
 
@@ -163,7 +167,13 @@ def validate_price(price: str | float | None, order_type: str) -> float | None:
     return p
 
 
-def validate_all(symbol: str, side: str, order_type: str, quantity, price) -> dict:
+def validate_all(
+    symbol: str,
+    side: str,
+    order_type: str,
+    quantity: Union[str, float],
+    price: Union[str, float, None],
+) -> dict:
     """
     Run all validations and return a clean, validated arguments dictionary.
 

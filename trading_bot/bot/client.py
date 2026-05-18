@@ -5,7 +5,7 @@ Reads API credentials from environment variables and returns a configured client
 
 import os
 from dotenv import load_dotenv
-from binance.um_futures import UMFutures
+from binance.client import Client
 
 from bot.logging_config import setup_logger
 
@@ -13,18 +13,17 @@ load_dotenv()
 
 logger = setup_logger()
 
-TESTNET_BASE_URL = "https://testnet.binancefuture.com"
 
-
-def get_client() -> UMFutures:
+def get_client() -> Client:
     """
-    Create and return an authenticated Binance USD-M Futures Testnet client.
+    Create and return an authenticated Binance Client pointed at the
+    USD-M Futures Testnet (https://testnet.binancefuture.com).
 
     Reads BINANCE_TESTNET_API_KEY and BINANCE_TESTNET_API_SECRET from the
     environment (or .env file).
 
     Returns:
-        Authenticated UMFutures client pointed at the testnet.
+        Authenticated Client instance with testnet=True.
 
     Raises:
         EnvironmentError: If API key or secret is missing.
@@ -50,10 +49,10 @@ def get_client() -> UMFutures:
     logger.debug("Initialising Binance Futures Testnet client.")
 
     try:
-        client = UMFutures(
-            key=api_key,
-            secret=api_secret,
-            base_url=TESTNET_BASE_URL,
+        client = Client(
+            api_key=api_key,
+            api_secret=api_secret,
+            testnet=True,
         )
         logger.info("Binance Futures Testnet client initialised successfully.")
         return client
