@@ -1,0 +1,92 @@
+============================================================
+  SAMPLE LOG OUTPUT — trading_bot/logs/trading_bot.log
+  These are representative log entries across different
+  scenarios: success, validation errors, and API errors.
+============================================================
+
+
+------------------------------------------------------------
+SCENARIO 1: Successful MARKET BUY order
+Command: python -m bot.cli --symbol BTCUSDT --side BUY --type MARKET --quantity 0.01
+------------------------------------------------------------
+
+2024-01-25 14:32:10 | INFO     | cli | CLI invoked | symbol=BTCUSDT | side=BUY | type=MARKET | quantity=0.01 | price=None
+2024-01-25 14:32:10 | INFO     | cli | Validation passed. Connecting to Binance Futures Testnet...
+2024-01-25 14:32:10 | DEBUG    | client | Initialising Binance Futures Testnet client.
+2024-01-25 14:32:10 | INFO     | client | Binance Futures Testnet client initialised successfully.
+2024-01-25 14:32:10 | INFO     | orders | Placing BUY MARKET order | Symbol: BTCUSDT | Quantity: 0.01
+2024-01-25 14:32:10 | DEBUG    | orders | Order request params: {'symbol': 'BTCUSDT', 'side': 'BUY', 'type': 'MARKET', 'quantity': 0.01}
+2024-01-25 14:32:11 | INFO     | orders | Order placed successfully | Order ID: 3279685045 | Status: FILLED
+2024-01-25 14:32:11 | DEBUG    | orders | Full API response: {'orderId': 3279685045, 'symbol': 'BTCUSDT', 'status': 'FILLED', 'clientOrderId': 'web_abc123', 'price': '0', 'avgPrice': '43215.60000', 'origQty': '0.01', 'executedQty': '0.01', 'cumQty': '0.01', 'cumQuote': '432.1560', 'timeInForce': 'GTC', 'type': 'MARKET', 'reduceOnly': False, 'closePosition': False, 'side': 'BUY', 'positionSide': 'BOTH', 'stopPrice': '0', 'workingType': 'CONTRACT_PRICE', 'priceMatch': 'NONE', 'selfTradePreventionMode': 'NONE', 'goodTillDate': 0, 'priceProtect': False, 'origType': 'MARKET', 'updateTime': 1706193131000}
+
+
+------------------------------------------------------------
+SCENARIO 2: Successful LIMIT SELL order
+Command: python -m bot.cli --symbol ETHUSDT --side SELL --type LIMIT --quantity 0.5 --price 3500
+------------------------------------------------------------
+
+2024-01-25 14:35:22 | INFO     | cli | CLI invoked | symbol=ETHUSDT | side=SELL | type=LIMIT | quantity=0.5 | price=3500
+2024-01-25 14:35:22 | INFO     | cli | Validation passed. Connecting to Binance Futures Testnet...
+2024-01-25 14:35:22 | DEBUG    | client | Initialising Binance Futures Testnet client.
+2024-01-25 14:35:22 | INFO     | client | Binance Futures Testnet client initialised successfully.
+2024-01-25 14:35:22 | INFO     | orders | Placing SELL LIMIT order | Symbol: ETHUSDT | Quantity: 0.5 | Price: 3500.0
+2024-01-25 14:35:22 | DEBUG    | orders | Order request params: {'symbol': 'ETHUSDT', 'side': 'SELL', 'type': 'LIMIT', 'quantity': 0.5, 'price': 3500.0, 'timeInForce': 'GTC'}
+2024-01-25 14:35:23 | INFO     | orders | Order placed successfully | Order ID: 3279701882 | Status: NEW
+2024-01-25 14:35:23 | DEBUG    | orders | Full API response: {'orderId': 3279701882, 'symbol': 'ETHUSDT', 'status': 'NEW', 'clientOrderId': 'web_def456', 'price': '3500.00', 'avgPrice': '0.00000', 'origQty': '0.50', 'executedQty': '0.00', 'cumQty': '0.00', 'cumQuote': '0.00000', 'timeInForce': 'GTC', 'type': 'LIMIT', 'reduceOnly': False, 'closePosition': False, 'side': 'SELL', 'positionSide': 'BOTH', 'stopPrice': '0', 'workingType': 'CONTRACT_PRICE', 'priceMatch': 'NONE', 'selfTradePreventionMode': 'NONE', 'goodTillDate': 0, 'priceProtect': False, 'origType': 'LIMIT', 'updateTime': 1706193323000}
+
+
+------------------------------------------------------------
+SCENARIO 3: Validation error — invalid side
+Command: python -m bot.cli --symbol BTCUSDT --side LONG --type MARKET --quantity 0.01
+------------------------------------------------------------
+
+2024-01-25 14:40:05 | INFO     | cli | CLI invoked | symbol=BTCUSDT | side=LONG | type=MARKET | quantity=0.01 | price=None
+2024-01-25 14:40:05 | ERROR    | cli | Validation failed: Invalid side 'LONG'. Must be one of: BUY, SELL.
+
+
+------------------------------------------------------------
+SCENARIO 4: Validation error — missing price for LIMIT order
+Command: python -m bot.cli --symbol BTCUSDT --side BUY --type LIMIT --quantity 0.01
+------------------------------------------------------------
+
+2024-01-25 14:42:18 | INFO     | cli | CLI invoked | symbol=BTCUSDT | side=BUY | type=LIMIT | quantity=0.01 | price=None
+2024-01-25 14:42:18 | ERROR    | cli | Validation failed: Price is required for LIMIT orders. Use --price to specify a value.
+
+
+------------------------------------------------------------
+SCENARIO 5: Validation error — invalid quantity
+Command: python -m bot.cli --symbol BTCUSDT --side BUY --type MARKET --quantity -5
+------------------------------------------------------------
+
+2024-01-25 14:44:55 | INFO     | cli | CLI invoked | symbol=BTCUSDT | side=BUY | type=MARKET | quantity=-5 | price=None
+2024-01-25 14:44:55 | ERROR    | cli | Validation failed: Invalid quantity '-5.0'. Quantity must be greater than zero.
+
+
+------------------------------------------------------------
+SCENARIO 6: API ClientError — insufficient margin balance
+Command: python -m bot.cli --symbol BTCUSDT --side BUY --type MARKET --quantity 999
+------------------------------------------------------------
+
+2024-01-25 14:47:30 | INFO     | cli | CLI invoked | symbol=BTCUSDT | side=BUY | type=MARKET | quantity=999 | price=None
+2024-01-25 14:47:30 | INFO     | cli | Validation passed. Connecting to Binance Futures Testnet...
+2024-01-25 14:47:30 | DEBUG    | client | Initialising Binance Futures Testnet client.
+2024-01-25 14:47:30 | INFO     | client | Binance Futures Testnet client initialised successfully.
+2024-01-25 14:47:30 | INFO     | orders | Placing BUY MARKET order | Symbol: BTCUSDT | Quantity: 999.0
+2024-01-25 14:47:30 | DEBUG    | orders | Order request params: {'symbol': 'BTCUSDT', 'side': 'BUY', 'type': 'MARKET', 'quantity': 999.0}
+2024-01-25 14:47:31 | ERROR    | orders | Binance client error [400 -2019]: Margin is insufficient.
+
+
+------------------------------------------------------------
+SCENARIO 7: EnvironmentError — missing API key in .env
+Command: python -m bot.cli --symbol BTCUSDT --side BUY --type MARKET --quantity 0.01
+(with empty BINANCE_TESTNET_API_KEY in .env)
+------------------------------------------------------------
+
+2024-01-25 14:50:10 | INFO     | cli | CLI invoked | symbol=BTCUSDT | side=BUY | type=MARKET | quantity=0.01 | price=None
+2024-01-25 14:50:10 | INFO     | cli | Validation passed. Connecting to Binance Futures Testnet...
+2024-01-25 14:50:10 | ERROR    | client | Missing environment variable: BINANCE_TESTNET_API_KEY
+
+
+============================================================
+END OF SAMPLE LOGS
+============================================================
